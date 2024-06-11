@@ -1,14 +1,20 @@
-const mysql2 = require('mysql2/promise')
+const {Sequelize} = require('sequelize')
 
-const DBConnection = mysql2.createPool({
-    port : 3307,
-    host :'localhost',  
-    user :'root',
-    password :'123456',
+
+const sequelize = new Sequelize('BookingCare', 'tobi1', 'Dang.khoi1', {
+    host: 'localhost',
+    dialect: 'mysql', 
     database : 'BookingCare',
-    waitForConnections : true,
-    connectionLimit : 10,
-    queueLimit : 0
-})
-
+    username :'tobi1',
+    password : 'Dang.khoi1',
+    port : '3306',
+  });
+  const DBConnection = async (app)=>{
+    try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+      } catch (error) {
+        console.error('Unable to connect to the database:', error);
+      }
+  }
 module.exports = {DBConnection}
