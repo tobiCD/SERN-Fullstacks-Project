@@ -9,7 +9,7 @@ const sequelize = new Sequelize('BookingCare', 'tobi1', 'Dang.khoi1', {
     password : 'Dang.khoi1',
     port : '3306',
   });
-  const DBConnection = async (app)=>{
+  const DBConnection = async ()=>{
     try {
         await sequelize.authenticate();
         console.log('Connection has been established successfully.');
