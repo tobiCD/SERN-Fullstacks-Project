@@ -4,48 +4,54 @@ const salt = bcrypt.genSaltSync()
 const db = require('../models/index.js')
 const user = require('../models/user.js')
 
-
-
-
-const handleLogin = (email , password,userData)=>{
-    return new Promise(async(resolve,reject)=>{
-        try {
-            let userData = {}
-            let ixExist =  await CheckEmailPassword(email,password);
-            if(ixExist){
-                resolve()
-            }
-            else{
-                userData.errorCode = 1;
-                userData.errorMessage = 'Nothing'
-                resolve(userData)
-            }
-        } catch (error) {
-                reject(error)
-        }
-    })
-
-}
-
-
-
 const CheckEmailPassword = (email, password )=>{
     return new Promise(async(resolve , reject)=>{
         try {
+            let userData = {}
             let user = await db.User.findOne({
-                where : {email : email , password : password}
+                where : {email : email},
+                raw : true
 
             })
+
+         
             if(user){
-                    resolve(true)
+                const passwordMatches = await bcrypt.compareSync(password, user.password)
+                console.log(user.password)
+           
+                console.log(passwordMatches)
+              await db.User.findOne({
+                    where : {password :passwordMatches}
+                    
+                })
+                if(passwordMatches)
+                    {
+                        delete user.password
+                        console.log(user)
+
+                        resolve({
+                                errorCode :0,
+                                errorMessage:'ok',
+                                user
+                            })
+                    }
+                    else{
+                        resolve({
+                            errorCode :2,
+                            errorMessage:'not correct password',
+                            ixExist : user
+                        })
+                    }
             }
             else{
-                resolve(false)
+                userData.errorCode = 1;
+                userData.errorMessage = 'User Not found'
+                resolve(userData)
             }
         } catch (error) {
-            reject(e)
+            reject(error)
         }
     })
 }
 
-module.exports = {handleLogin}
+module.exports = {CheckEmailPassword}

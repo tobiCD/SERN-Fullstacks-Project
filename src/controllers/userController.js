@@ -5,7 +5,8 @@ const bodyParser = require('body-parser')
 const DBConnection = require('../config/Db.js')
 const db = require('../models/index.js')
 const {createUser ,GetAllData, getUserById ,UpdateDB} = require('../services/CRUDservices.js')
-const {handleLogin} = require('../services/userService.js')
+const {CheckEmailPassword} = require('../services/userService.js')
+const user = require('../models/user.js')
 
 
 
@@ -20,12 +21,13 @@ const hangleUserLogin = async (req,res)=>{
                 message : 'Missing input Parameters'
             })
         } else{
-            let UserData = await handleLogin(email,password);
+            let UserData = await CheckEmailPassword(email,password);
+            delete UserData.password
             return res.status(200).json({
               
                 error : UserData.errorCode,
-                message : UserData.errorMessage
-
+                message : UserData.errorMessage,
+                user : UserData.user ? UserData.user :{'a':'av'}
             })
         }
     }
